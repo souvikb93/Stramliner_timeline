@@ -26,10 +26,9 @@ body{display:block!important}
 .bar{position:absolute;height:22px;top:50%;transform:translateY(-50%);border-radius:6px;display:flex;align-items:center;justify-content:center;
  font-size:9.5px;font-weight:600;white-space:nowrap;overflow:hidden;
  background:var(--tint);border:1px solid var(--c);color:var(--c);
- opacity:.34;transition:opacity .3s,box-shadow .25s,border-width .2s}
+ transition:opacity .3s,box-shadow .25s}
 .bar.dash{border-style:dashed;font-size:8.5px}
-.bar.on{opacity:1;box-shadow:0 2px 6px rgba(18,18,18,.12)}
-.bar.past{opacity:.62}
+.bar.on{box-shadow:0 2px 7px rgba(18,18,18,.18)}
 .bar.hov{box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--c)}
 .head{position:absolute;top:26px;bottom:0;width:2px;background:var(--brand);opacity:.5;pointer-events:none;z-index:3;transition:opacity .2s}
 .head::before{content:"";position:absolute;top:-5px;left:-4px;width:10px;height:10px;border-radius:50%;background:var(--brand)}
@@ -75,31 +74,31 @@ const GROUPS=[
     {ph:'prep',segs:[['Prep',0,2,'Discussion guide, recruitment and tool inventory',0]]}]],
   ['North America','USA, Canada · 12 interviews',[
     {ph:'disc',segs:[['USA',2,6.5,'United States',9],['CA',6.5,8,'Canada',3]]},
-    {ph:'disc',dash:1,segs:[['Follow',8,11,'Follow-up sessions and tool walkthroughs',0]]}]],
+    {ph:'disc',dash:1,segs:[['Follow-Up',8,11,'Follow-up sessions and tool walkthroughs',0]]}]],
   ['Western Europe','FR, DE, ES, IT, NL · 16',[
     {ph:'disc',segs:[['FR',5,7,'France',4],['DE',7,9,'Germany',4],['ES',9,10.5,'Spain',3],['IT',10.5,12,'Italy',3],['NL',12,13,'Netherlands',2]]},
-    {ph:'disc',dash:1,segs:[['Follow',13,16,'Follow-ups across the five markets',0]]}]],
+    {ph:'disc',dash:1,segs:[['Follow-Up',13,16,'Follow-ups across the five markets',0]]}]],
   ['UK & Ireland','UK, Ireland · 6 interviews',[
     {ph:'disc',segs:[['UK',6,9.5,'United Kingdom',4],['IE',9.5,11,'Ireland',2]]}]],
   ['Latin America','Brazil, Mexico · 8 interviews',[
     {ph:'disc',segs:[['BR',10,13.5,'Brazil',5],['MX',13.5,16,'Mexico',3]]},
-    {ph:'disc',dash:1,segs:[['Follow',16,18,'Carrier and logistics follow-ups',0]]}]],
+    {ph:'disc',dash:1,segs:[['Follow-Up',16,18,'Carrier and logistics follow-ups',0]]}]],
   ['India','India · 6 interviews',[
     {ph:'disc',segs:[['India',14,18,'India',6]]}]],
   ['Asia Pacific & Japan','Japan, China, Singapore · 9',[
     {ph:'disc',segs:[['JP',15,17.5,'Japan',4],['CN',17.5,19.5,'China',3],['SG',19.5,21,'Singapore',2]]},
-    {ph:'disc',dash:1,segs:[['Follow',21,23,'Translator-supported follow-ups',0]]}]],
+    {ph:'disc',dash:1,segs:[['Follow-Up',21,23,'Translator-supported follow-ups',0]]}]],
   ['Australia & NZ','Australia, New Zealand · 5',[
     {ph:'disc',segs:[['AU',18,20.5,'Australia',3],['NZ',20.5,22,'New Zealand',2]]}]]]],
  ['Programme workstreams',[
   ['Synthesis','Rolling, per region',[
-    {ph:'syn',segs:[['Per-region readouts',8,17,'Gaps and commonalities, region by region',0],['Cross-region',17,25,'Three insights, three opportunity areas',0]]}]],
+    {ph:'syn',segs:[['Per-Region Readouts',8,17,'Gaps and commonalities, region by region',0],['Cross-Region',17,25,'Three insights, three opportunity areas',0]]}]],
   ['Co-creation','Architects, product, eng, sales',[
     {ph:'cc',segs:[['Vision',20,24,'Workshops on the shared vision',0],['Framework',24,29,'Module boundaries and ownership',0]]}]],
   ['Design & define','Modules, rule layer, blueprints',[
-    {ph:'dd',segs:[['Five modules',26,34,'Create & Edit through Disposition & Recovery',0],['Rule layer',34,39,'Regional rules and the V&R engine',0],['Blueprints',39,45,'To-be service blueprints and UI',0]]}]],
+    {ph:'dd',segs:[['Five Modules',26,34,'Create & Edit through Disposition & Recovery',0],['Rule Layer',34,39,'Regional rules and the V&R engine',0],['Blueprints',39,45,'To-be service blueprints and UI',0]]}]],
   ['Validate & pilot','ANZ proof of concept',[
-    {ph:'vp',segs:[['Prototype tests',42,46,'Sessions with care agents',0],['ANZ pilot',46,52,'Proof of concept, measured against baseline',0]]}]]]]
+    {ph:'vp',segs:[['Prototype',42,46,'Sessions with care agents',0],['ANZ Pilot',46,52,'Proof of concept, measured against baseline',0]]}]]]]
 ];
 const MS=[[2,'Kick-off'],[13,'Interim findings'],[29,'Framework signed off'],[45,'Pilot go-live'],[51,'Impact readout']];
 const $=i=>document.getElementById(i),pc=w=>w/W*100+'%';
@@ -110,6 +109,7 @@ MONTHS.forEach((m,i)=>{html+=`<div class="mo${i%3?'':' q'}" style="left:${pc(i*W
 html+='</div><div class="mspacer"></div><div class="mrow">';
 MS.forEach((m,i)=>{html+=`<div class="ms" id="m_${i}" style="left:${pc(m[0])}"></div><div class="msl${m[0]>W*.72?' end':''}" style="left:${pc(m[0])}">${m[1]}</div>`});
 html+='</div>';
+let UID=0;
 GROUPS.forEach(([gname,rows])=>{
  html+=`<div class="ghead">${gname}</div>`;
  rows.forEach((r,ri)=>{
@@ -117,8 +117,8 @@ GROUPS.forEach(([gname,rows])=>{
   r[2].forEach((b,bi)=>{
    const col=PH[b.ph],tint=MIX(col,.06);
    b.segs.forEach((g,gi)=>{
-    const id=`b${ri}_${bi}_${gi}`,code=g[0],s=g[1],e=g[2],full=g[3],iv=g[4];
-    BARS.push({id,s,e,row:r[0],full,iv});
+    const id='bar'+(UID++),code=g[0],s=g[1],e=g[2],full=g[3],iv=g[4];
+    BARS.push({id,s,e,row:r[0],full,iv,col,tint});
     const wp=(e-s)/W*100;
     html+=`<div class="bar${b.dash?' dash':''}" id="${id}" data-i="${BARS.length-1}"
       style="--c:${col};--tint:${tint};left:calc(${pc(s)} + ${gi?1.5:0}px);width:calc(${wp}% - ${gi?1.5:0}px)">${wp>1.8?code:''}</div>`})});
@@ -131,10 +131,10 @@ const PLAY='<svg width="11" height="12" viewBox="0 0 11 12" fill="currentColor">
 const PAUSE='<svg width="10" height="12" viewBox="0 0 10 12" fill="currentColor"><rect x="0" y="0" width="3.2" height="12" rx="1"/><rect x="6.8" y="0" width="3.2" height="12" rx="1"/></svg>';
 
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-let wk=0,playing=true,timer=null,hov=-1,dragging=false;
+let wk=0,mode='play',prevMode='play',timer=null,hov=-1,dragging=false;
 function axisRect(){const a=$('axis').getBoundingClientRect(),g=$('grid').getBoundingClientRect();
  return {l:a.left-g.left,w:a.width,gl:a.left}}
-function showAll(){return !playing&&!dragging&&wk<=0}
+function showAll(){return mode==='all'}
 function paint(){
  const a=axisRect(),all=showAll();
  headEl.style.left=(a.l+a.w*wk/W)+'px';
@@ -146,11 +146,15 @@ function paint(){
  const live=[];
  BARS.forEach(b=>{const el=$(b.id);
   const on=all||(wk>=b.s&&wk<b.e),past=!all&&wk>=b.e;
-  el.classList.toggle('on',on);el.classList.toggle('past',past);
+  el.classList.toggle('on',on);
+  el.style.background=(on||past)?b.tint:'#fff';
+  el.style.borderWidth=on?'2px':'1px';
+  el.style.fontWeight=on?'700':'600';
+  el.style.opacity=on?1:(past?.7:.42);
   if(on&&!all)live.push(b)});
  MS.forEach((m,i)=>$('m_'+i).classList.toggle('on',all||wk>=m[0]));
- $('pp').innerHTML=playing?PAUSE:PLAY;
- $('pp').setAttribute('aria-label',playing?'Pause':'Play');
+ $('pp').innerHTML=mode==='play'?PAUSE:PLAY;
+ $('pp').setAttribute('aria-label',mode==='play'?'Pause':'Play');
  if(all){$('now').textContent='Full plan';
   $('act').innerHTML='<b>62 interviews across 17 countries in 7 regions</b>, then one framework designed, built and piloted in ANZ.';return}
  $('now').textContent=`${moOf(wk)} · wk ${Math.floor(wk)+1} of 52`;
@@ -161,14 +165,14 @@ function paint(){
   :live.length?live.map(b=>`<b>${b.row}</b> · ${b.full}`).join('&nbsp;&nbsp;·&nbsp;&nbsp;')
   :'Between phases';
 }
-function step(){wk+=.16;if(wk>W){wk=0;playing=false;paint();return}paint();timer=setTimeout(step,reduce?420:135)}
-function play(){clearTimeout(timer);playing=true;if(wk>=W)wk=0;step()}
-function pause(){clearTimeout(timer);playing=false;wk=0;paint()}
-$('pp').addEventListener('click',()=>{playing?pause():play()});
+function step(){wk+=.16;if(wk>W)wk=0;paint();timer=setTimeout(step,reduce?420:135)}
+function play(){clearTimeout(timer);mode='play';dragging=false;hov=-1;clearHov();if(wk>=W)wk=0;step()}
+function pause(){clearTimeout(timer);mode='all';dragging=false;hov=-1;clearHov();paint()}
+$('pp').addEventListener('click',()=>{mode==='play'?pause():play()});
 
 function weekAtRail(x){const r=$('rail').getBoundingClientRect();
  return Math.max(0,Math.min(W,(x-r.left)/r.width*W))}
-function scrubTo(x){clearTimeout(timer);playing=false;wk=weekAtRail(x);paint()}
+function scrubTo(x){clearTimeout(timer);mode='scrub';wk=weekAtRail(x);paint()}
 $('rail').addEventListener('pointerdown',e=>{dragging=true;$('rail').setPointerCapture(e.pointerId);scrubTo(e.clientX)});
 $('rail').addEventListener('pointermove',e=>{if(dragging)scrubTo(e.clientX)});
 $('rail').addEventListener('pointerup',e=>{dragging=false;$('rail').releasePointerCapture(e.pointerId);paint()});
@@ -176,17 +180,17 @@ $('rail').addEventListener('pointerup',e=>{dragging=false;$('rail').releasePoint
 const grid=$('grid');
 function weekAt(x){const a=axisRect();return Math.max(0,Math.min(W,(x-a.gl)/a.w*W))}
 function clearHov(){BARS.forEach(b=>$(b.id).classList.remove('hov'))}
+grid.addEventListener('mouseenter',()=>{if(mode!=='scrub')prevMode=mode});
 grid.addEventListener('mousemove',e=>{clearTimeout(timer);
- const wasPlaying=playing;playing=false;dragging=true;
- wk=weekAt(e.clientX);
+ mode='scrub';wk=weekAt(e.clientX);
  const t=e.target.closest('.bar'),nh=t?+t.dataset.i:-1;
  if(nh!==hov){hov=nh;clearHov();if(hov>=0)$(BARS[hov].id).classList.add('hov')}
- grid.dataset.was=wasPlaying?'1':(grid.dataset.was||'0');
  paint()});
-grid.addEventListener('mouseleave',()=>{dragging=false;hov=-1;clearHov();
- if(grid.dataset.was==='1'){grid.dataset.was='0';play()}else paint()});
-grid.addEventListener('wheel',e=>{e.preventDefault();clearTimeout(timer);playing=false;dragging=true;
- wk=Math.max(0,Math.min(W,wk+(e.deltaY+e.deltaX)*.012));paint()},{passive:false});
+grid.addEventListener('mouseleave',()=>{hov=-1;clearHov();
+ if(prevMode==='play')play();else{mode=prevMode;paint()}});
+grid.addEventListener('wheel',e=>{e.preventDefault();clearTimeout(timer);
+ if(mode!=='scrub')prevMode=mode;
+ mode='scrub';wk=Math.max(0,Math.min(W,wk+(e.deltaY+e.deltaX)*.012));paint()},{passive:false});
 addEventListener('resize',paint);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(timer);else if(playing)step()});
 paint();play();
