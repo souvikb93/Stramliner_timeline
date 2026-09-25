@@ -1,0 +1,146 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+@font-face{font-family:'Uncut Sans';src:url(https://cdn.jsdelivr.net/gh/kaspernordkvist/uncut_sans@b3b42467781e3bd98c68f2d70eba325196e7d9c5/Webfonts/UncutSans-Variable.woff2) format('woff2');font-weight:300 700;font-style:normal;font-display:swap}
+:root{--ink:#121212;--ink2:#454548;--ink3:#696970;--line:#E9E9EC;--line2:#D9D9DE;--brand:#0672CB;--deep:#06356E;--green:#1E8A4C;--green-dot:#3DDC84;
+--disc:#0672CB;--syn:#7C3AED;--cc:#A15C00;--dd:#B02071;--vp:#0B6E4F}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;min-height:100%;overflow:hidden;background:transparent;font-family:'Uncut Sans',-apple-system,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+body{display:block!important}
+.app{width:100vw;max-width:1200px;padding:2px;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:16px;padding:2px 2px 14px;border-bottom:1px solid var(--line)}
+.tabs{position:relative;flex:none;display:flex;gap:3px;background:#fff;border:1px solid var(--line2);padding:4px;border-radius:999px;box-shadow:0 1px 2px rgba(18,18,18,.04)}
+.tabs button{font:inherit;position:relative;z-index:1;display:flex;align-items:center;height:34px;padding:0 14px;border:0;background:transparent;border-radius:999px;color:var(--ink2);font-size:13px;font-weight:600;cursor:pointer;transition:color .25s}
+.tabs button:hover{color:var(--ink)}
+.tabs button.on{color:#fff}
+.tabs button:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+.tabs .pill{position:absolute;top:4px;left:4px;height:34px;border-radius:999px;background:var(--deep);z-index:0;transition:transform .42s cubic-bezier(.34,1.24,.5,1),width .42s cubic-bezier(.34,1.24,.5,1)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin-left:auto}
+.lg{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--ink2);white-space:nowrap}
+.lg i{width:9px;height:9px;border-radius:3px;flex:none}
+.canvas{margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 1px 2px rgba(18,18,18,.03)}
+.grid{position:relative;display:grid;grid-template-columns:196px minmax(0,1fr)}
+.axis{grid-column:2;position:relative;height:28px;border-bottom:1px solid var(--line)}
+.mo{position:absolute;top:0;bottom:0;font-size:10.5px;font-weight:600;color:var(--ink3);padding-left:6px;border-left:1px solid var(--line)}
+.mo.q{border-left-color:var(--line2)}
+.spacer{grid-column:1;height:28px;border-bottom:1px solid var(--line)}
+.ghead{grid-column:1/3;font-size:10px;font-weight:700;letter-spacing:.07em;color:var(--ink3);padding:9px 0 4px}
+.rl{grid-column:1;display:flex;flex-direction:column;justify-content:center;height:30px;padding-right:12px}
+.rl b{font-size:11.5px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rl span{font-size:9.5px;color:var(--ink3);line-height:1.2;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track{grid-column:2;position:relative;height:30px;border-top:1px solid #F4F4F6}
+.bar{position:absolute;height:18px;top:50%;transform:translateY(-50%);border-radius:5px;display:flex;align-items:center;padding:0 7px;font-size:9.5px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;opacity:.34;transition:opacity .3s,box-shadow .3s}
+.bar.lo{height:11px;border-radius:4px;opacity:.26}
+.bar.on{opacity:1;box-shadow:0 2px 6px rgba(18,18,18,.16)}
+.bar.past{opacity:.62}
+.ms{position:absolute;top:50%;width:11px;height:11px;transform:translate(-50%,-50%) rotate(45deg);background:#fff;border:1.8px solid var(--ink2);border-radius:2px;transition:background .3s,border-color .3s}
+.ms.on{background:var(--green);border-color:var(--green)}
+.msl{position:absolute;top:50%;transform:translateY(-50%);font-size:9.5px;font-weight:600;color:var(--ink2);white-space:nowrap;padding-left:11px}
+.msl.end{transform:translate(-100%,-50%);padding:0 11px 0 0}
+.head{position:absolute;top:28px;bottom:0;width:2px;background:var(--brand);opacity:.5;pointer-events:none;z-index:3}
+.head::before{content:"";position:absolute;top:-5px;left:-4px;width:10px;height:10px;border-radius:50%;background:var(--brand)}
+.foot{display:flex;align-items:center;gap:10px;margin-top:24px;padding-top:24px;border-top:1px solid var(--line);min-height:44px}
+.now{font-size:11px;font-weight:600;color:var(--ink3);flex:none;width:74px}
+.act{font-size:12.5px;color:var(--ink2);line-height:1.35;min-height:17px}
+.act b{font-weight:600;color:var(--ink)}
+@media (min-width:900px){body{min-height:700px}}
+@media (max-width:900px){.legend{display:none}}
+@media (max-width:760px){.top{flex-wrap:wrap}.canvas{overflow-x:auto;-webkit-overflow-scrolling:touch}.grid{min-width:860px}.foot{min-width:860px}}
+@media (max-width:440px){.canvas{padding:16px}}
+@media (prefers-reduced-motion:reduce){.bar,.ms,.tabs .pill{transition:none}}
+</style></head><body>
+<div class="app">
+ <div class="top">
+  <div class="tabs" id="tabs" role="tablist" aria-label="View">
+   <button data-v="play" class="on">Play</button>
+   <button data-v="pause">Pause</button>
+   <button data-v="all">Show all</button>
+  </div>
+  <div class="legend" id="legend"></div>
+ </div>
+ <div class="canvas">
+  <div class="grid" id="grid"></div>
+  <div class="foot"><span class="now" id="now"></span><p class="act" id="act"></p></div>
+ </div>
+</div>
+<script>
+const PH={disc:['Discover','#0672CB'],syn:['Synthesise','#7C3AED'],cc:['Co-create','#A15C00'],dd:['Design & define','#B02071'],vp:['Validate & pilot','#0B6E4F']};
+const W=52;
+const GROUPS=[
+ ['Field research by region',[
+  ['North America','USA, Canada · 12',[['disc',2,8,'Interviews'],['disc',8,11,'Follow-ups',1]]],
+  ['Western Europe','FR, DE, ES, IT, NL · 16',[['disc',5,13,'Interviews'],['disc',13,16,'Follow-ups',1]]],
+  ['UK & Ireland','UK, Ireland · 6',[['disc',6,11,'Interviews']]],
+  ['Latin America','Brazil, Mexico · 8',[['disc',10,16,'Interviews'],['disc',16,18,'Follow-ups',1]]],
+  ['India','India · 6',[['disc',14,18,'Interviews']]],
+  ['Asia Pacific & Japan','Japan, China, Singapore · 9',[['disc',15,21,'Interviews'],['disc',21,23,'Follow-ups',1]]],
+  ['Australia & NZ','Australia, NZ · 5',[['disc',18,22,'Interviews']]]]],
+ ['Programme workstreams',[
+  ['Synthesis','Rolling, per region',[['syn',8,25,'Gaps, commonalities, opportunity areas']]],
+  ['Co-creation','Architects, product, eng, sales',[['cc',20,29,'Workshops']]],
+  ['Design & define','Five modules + rule layer',[['dd',26,43,'Module design']]],
+  ['Rules & blueprints','V&R rules, to-be blueprints',[['dd',30,45,'Rules and blueprints',1]]],
+  ['Validate & pilot','ANZ proof of concept',[['vp',42,52,'Prototype tests, then pilot']]]]]
+];
+const MS=[[12,'Interim findings'],[29,'Framework signed off'],[45,'Pilot go-live'],[51,'Impact readout']];
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const $=i=>document.getElementById(i),pc=w=>w/W*100+'%';
+
+$('legend').innerHTML=Object.values(PH).map(p=>`<span class="lg"><i style="background:${p[1]}"></i>${p[0]}</span>`).join('');
+
+let html='<div class="spacer"></div><div class="axis" id="axis">',BARS=[];
+MONTHS.forEach((m,i)=>{const w=i*W/12;html+=`<div class="mo${i%3?'':' q'}" style="left:${pc(w)};width:${100/12}%">${m}</div>`});
+html+='</div>';
+GROUPS.forEach(([gname,rows])=>{
+ html+=`<div class="ghead">${gname}</div>`;
+ rows.forEach((r,ri)=>{
+  html+=`<div class="rl"><b>${r[0]}</b><span>${r[1]}</span></div><div class="track">`;
+  r[2].forEach((b,bi)=>{
+   const id=`b_${gname[0]}${ri}_${bi}`;
+   BARS.push({id,ph:b[0],s:b[1],e:b[2],lab:b[3],row:r[0]});
+   html+=`<div class="bar${b[4]?' lo':''}" id="${id}" style="left:${pc(b[1])};width:${pc(b[2]-b[1])};background:${PH[b[0]][1]}">${b[4]?'':b[3]}</div>`});
+  html+='</div>'});
+});
+html+='<div class="ghead">Milestones</div><div class="rl"><b>Client checkpoints</b><span>Shared readouts and sign-off</span></div><div class="track" id="mst">';
+MS.forEach((m,i)=>{html+=`<div class="ms" id="m_${i}" style="left:${pc(m[0])}"></div><div class="msl${m[0]>W*.72?' end':''}" style="left:${pc(m[0])}">${m[1]}</div>`});
+html+='</div>';
+$('grid').innerHTML=html;
+const headEl=document.createElement('div');headEl.className='head';headEl.id='head';$('grid').appendChild(headEl);
+
+const _pill=document.createElement('span');_pill.className='pill';$('tabs').prepend(_pill);
+function movePill(){const b=document.querySelector('#tabs button.on');if(!b)return;
+ _pill.style.width=b.offsetWidth+'px';_pill.style.height=b.offsetHeight+'px';
+ _pill.style.transform=`translateX(${b.offsetLeft-4}px) translateY(${b.offsetTop-4}px)`}
+addEventListener('resize',movePill);movePill();
+if(document.fonts)document.fonts.ready.then(movePill);
+if(window.ResizeObserver)new ResizeObserver(movePill).observe($('tabs'));
+
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let wk=0,playing=true,timer=null,showAll=false;
+function paint(){
+ const axis=$('axis'),gb=$('grid').getBoundingClientRect(),ab=axis.getBoundingClientRect();
+ headEl.style.left=(ab.left-gb.left+ab.width*wk/W)+'px';
+ headEl.style.opacity=showAll?0:.5;
+ const live=[];
+ BARS.forEach(b=>{const el=$(b.id);
+  const on=showAll||(wk>=b.s&&wk<b.e),past=!showAll&&wk>=b.e;
+  el.classList.toggle('on',on);el.classList.toggle('past',past);
+  if(on&&!showAll)live.push(b)});
+ MS.forEach((m,i)=>$('m_'+i).classList.toggle('on',showAll||wk>=m[0]));
+ const mi=Math.min(11,Math.floor(wk/W*12));
+ $('now').textContent=showAll?'Full plan':`${MONTHS[mi]} · wk ${Math.floor(wk)+1}`;
+ if(showAll){$('act').innerHTML='<b>62 interviews across 17 countries in 7 regions</b>, then one framework designed, built and piloted in ANZ.';return}
+ const hit=MS.find(m=>Math.abs(m[0]-wk)<.5);
+ $('act').innerHTML=hit?`<b>Milestone —</b> ${hit[1]}`
+  :live.length?live.map(b=>`<b>${b.row}</b> · ${b.lab}`).join('&nbsp;&nbsp;·&nbsp;&nbsp;')
+  :'Between phases';
+}
+function step(){wk+=.25;if(wk>W){wk=0}paint();timer=setTimeout(step,reduce?400:110)}
+function play(){clearTimeout(timer);playing=true;showAll=false;mark('play');step()}
+function pause(){clearTimeout(timer);playing=false;mark('pause');paint()}
+function all(){clearTimeout(timer);playing=false;showAll=true;mark('all');paint()}
+function mark(v){document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));movePill()}
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ ({play,pause,all})[b.dataset.v]()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(timer);else if(playing)step()});
+paint();play();
+</script></body></html>
