@@ -58,6 +58,8 @@ body{display:block!important}
 </div>
 <script>
 const PH={prep:'#57575C',disc:'#0672CB',syn:'#7C3AED',cc:'#A15C00',dd:'#B02071',vp:'#0B6E4F'};
+const DARK=(hex,a)=>{const n=parseInt(hex.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255,m=v=>Math.round(v*(1-a));
+ return '#'+((1<<24)+(m(r)<<16)+(m(g)<<8)+m(b)).toString(16).slice(1)};
 const MIX=(hex,a)=>{const n=parseInt(hex.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255,m=v=>Math.round(v*a+255*(1-a));
  return '#'+((1<<24)+(m(r)<<16)+(m(g)<<8)+m(b)).toString(16).slice(1)};
 const W=52;
@@ -109,7 +111,7 @@ GROUPS.forEach(([gname,rows])=>{
    const col=PH[b.ph],tint=MIX(col,.06);
    b.segs.forEach((g,gi)=>{
     const id='bar'+(UID++),code=g[0],s=g[1],e=g[2],full=g[3],iv=g[4];
-    BARS.push({id,s,e,row:r[0],full,iv,col,tint});
+    BARS.push({id,s,e,row:r[0],full,iv,col,tint,dark:DARK(col,.3)});
     const wp=(e-s)/W*100;
     html+=`<div class="bar${b.dash?' dash':''}" id="${id}" data-i="${BARS.length-1}"
       style="--c:${col};--tint:${tint};left:calc(${pc(s)} + ${gi?1.5:0}px);width:calc(${wp}% - ${gi?1.5:0}px)">${wp>1.8?code:''}</div>`})});
@@ -139,7 +141,7 @@ function paint(){
   const on=all||(wk>=b.s&&wk<b.e),past=!all&&wk>=b.e;
   el.classList.toggle('on',on);
   el.style.background=(on||past)?b.tint:'#fff';
-  el.style.borderWidth=on?'2px':'1px';
+  el.style.borderColor=on?b.dark:b.col;
   el.style.fontWeight=on?'700':'600';
   el.style.opacity=on?1:(past?.7:.42);
   if(on&&!all)live.push(b)});
