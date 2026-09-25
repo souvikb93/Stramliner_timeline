@@ -12,11 +12,12 @@ body{display:block!important}
 .axis{grid-column:2;position:relative;height:26px;border-bottom:1px solid var(--line)}
 .mo{position:absolute;top:3px;font-size:10.5px;font-weight:600;color:var(--ink3);padding-left:7px;border-left:1px solid var(--line);height:20px}
 .mo.q{border-left-color:var(--line2);color:var(--ink2)}
-.ghead{grid-column:1/3;font-size:12.5px;font-weight:700;letter-spacing:-.01em;color:var(--ink);padding:16px 0 8px}
-.rl{grid-column:1;display:flex;flex-direction:column;justify-content:center;height:40px;padding-right:16px}
-.rl b{font-size:11.5px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rl span{font-size:9.5px;color:var(--ink3);line-height:1.2;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.track{grid-column:2;position:relative;height:40px;border-top:1px solid #F4F4F6}
+.ghead{grid-column:1/3;font-size:13.5px;font-weight:700;letter-spacing:-.015em;color:var(--ink);padding:22px 0 10px;border-top:1px solid var(--line)}
+.ghead.first{border-top:0;padding-top:14px}
+.rl{grid-column:1;display:flex;flex-direction:column;justify-content:center;height:39px;padding-right:16px}
+.rl b{font-size:11px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rl span{font-size:9.5px;font-weight:500;color:var(--ink3);line-height:1.2;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track{grid-column:2;position:relative;height:39px;border-top:1px solid #F4F4F6}
 .bar{position:absolute;height:22px;top:50%;transform:translateY(-50%);border-radius:6px;display:flex;align-items:center;justify-content:center;
  font-size:9.5px;font-weight:600;white-space:nowrap;overflow:hidden;
  background:var(--tint);border:1px solid var(--c);color:var(--c);
@@ -66,7 +67,7 @@ const W=52;
 const MONTHS=['Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb'];
 const GROUPS=[
  ['Setup and Field Research',[
-  ['Project preparation','Protocol, recruitment, tools audit',[
+  ['Project Preparation','Protocol, recruitment, tools audit',[
     {ph:'prep',segs:[['Prep',0,2,'Discussion guide, recruitment and tool inventory',0]]}]],
   ['North America','USA, Canada · 12 interviews',[
     {ph:'disc',segs:[['USA',2,6.5,'United States',9],['CA',6.5,8,'Canada',3]]},
@@ -89,11 +90,11 @@ const GROUPS=[
  ['Programme Workstreams',[
   ['Synthesis','Rolling, per region',[
     {ph:'syn',segs:[['Per-Region Readouts',8,17,'Gaps and commonalities, region by region',0],['Cross-Region',17,25,'Three insights, three opportunity areas',0]]}]],
-  ['Co-creation','Architects, product, eng, sales',[
+  ['Co-Creation','Architects, product, eng, sales',[
     {ph:'cc',segs:[['Vision',20,24,'Workshops on the shared vision',0],['Framework',24,29,'Module boundaries and ownership',0]]}]],
-  ['Design & define','Modules, rule layer, blueprints',[
+  ['Design & Define','Modules, rule layer, blueprints',[
     {ph:'dd',segs:[['Five Modules',26,34,'Create & Edit through Disposition & Recovery',0],['Rule Layer',34,39,'Regional rules and the V&R engine',0],['Blueprints',39,45,'To-be service blueprints and UI',0]]}]],
-  ['Validate & pilot','ANZ proof of concept',[
+  ['Validate & Pilot','ANZ proof of concept',[
     {ph:'vp',segs:[['Prototype',42,46,'Sessions with care agents',0],['ANZ Pilot',46,52,'Proof of concept, measured against baseline',0]]}]]]]
 ];
 const $=i=>document.getElementById(i),pc=w=>w/W*100+'%';
@@ -103,8 +104,8 @@ let html='<div class="spacer"></div><div class="axis" id="axis">',BARS=[];
 MONTHS.forEach((m,i)=>{html+=`<div class="mo${i%3?'':' q'}" style="left:${pc(i*W/12)};width:${100/12}%">${m}</div>`});
 html+='</div>';
 let UID=0;
-GROUPS.forEach(([gname,rows])=>{
- html+=`<div class="ghead">${gname}</div>`;
+GROUPS.forEach(([gname,rows],gi2)=>{
+ html+=`<div class="ghead${gi2?'':' first'}">${gname}</div>`;
  rows.forEach((r,ri)=>{
   html+=`<div class="rl"><b>${r[0]}</b><span>${r[1]}</span></div><div class="track">`;
   r[2].forEach((b,bi)=>{
